@@ -1,6 +1,7 @@
 package org.ceva.jcalculator;
 
 import org.ceva.jcalculator.api.KeyListener;
+import org.ceva.jcalculator.business.Calculate;
 import org.ceva.jcalculator.components.CalcMainPanel;
 import org.ceva.jcalculator.components.KeyboardPanel;
 import org.ceva.jcalculator.components.LCDPanel;
@@ -12,7 +13,6 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 import java.util.Locale;
 import java.util.Timer;
@@ -150,36 +150,12 @@ public class JCalculator implements KeyListener {
         new JCalculator().start();
     }
 
-    private void calculate(){
-        // convertimos los valores ingresados en numeros
+    private void compute(){
         try{
             boolean errorFlag = false;
-            double d0 = Double.parseDouble(lastValue.toString());
-            double d1 = Double.parseDouble(edValue.toString());
             double res;
-            switch (op){
-                case '+':
-                    res = d0 + d1;
-                    break;
-                case '-':
-                    res = d0 - d1;
-                    break;
-                case '*':
-                    res = d0 * d1;
-                    break;
-                case '/':
-                    res = d0 / d1;
-                    if((Double.isNaN(res)) || (Double.isInfinite(res))){
-                        errorFlag = true;
-                    }
-                    // validamos que res no sea menor al valor minimo permitido de un double
-                    else if(Math.abs(res) < Double.MIN_NORMAL){
-                        res = 0;
-                    }
-                    break;
-                default:
-                    res = 0;
-            }
+            Calculate calculate = new Calculate(edValue, lastValue, op);
+            res = calculate.perform();
             // convertimos el resultado a String para presentarlo en la pantalla
             String strRes;
             // validaos q no haya errores
@@ -284,7 +260,7 @@ public class JCalculator implements KeyListener {
              * por lo que un signo + se puede leer como un realiza la operacion pendiente
              */
             if(op != 0){
-                calculate();
+                compute();
                 if(edValue.length() > 0){
                     screen.setValue(edValue);
                 }
@@ -307,7 +283,7 @@ public class JCalculator implements KeyListener {
                 // no hacemos nada
                 return;
             }
-            calculate();
+            compute();
             if(edValue.length() > 0){
                 screen.setValue(edValue);
             }
